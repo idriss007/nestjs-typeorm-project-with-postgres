@@ -19,7 +19,10 @@ export class SentencesService {
   }
 
   async findAll() {
-    return await this.sentencesRepository.find({ relations: { author: true } });
+    return await this.sentencesRepository.find({
+      select: { id: true, text: true },
+      relations: { author: true },
+    });
   }
 
   async findOne(id: number) {
