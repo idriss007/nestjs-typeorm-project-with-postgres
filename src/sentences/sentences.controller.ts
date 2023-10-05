@@ -11,7 +11,7 @@ import { CreateSentenceDto } from './dto/create-sentence.dto';
 import { SentencesService } from './sentences.service';
 import { UpdateSentenceDto } from './dto/update-sentence.dto';
 
-@Controller()
+@Controller('sentences')
 export class SentencesController {
   constructor(private readonly sentencesService: SentencesService) {}
 

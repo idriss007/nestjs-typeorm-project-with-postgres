@@ -14,5 +14,5 @@ export default new DataSource({
   username: configService.getOrThrow('POSTGRES_USER'),
   password: configService.getOrThrow('POSTGRES_PASSWORD'),
   migrations: ['migrations/**'],
-  entities: ['dist/src/sentences/entities/**/*.entity.js'],
+  entities: ['dist/src/**/entities/**/*.entity.js'],
 });
