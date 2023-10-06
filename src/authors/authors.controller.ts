@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 
@@ -14,5 +14,10 @@ export class AuthorsController {
   @Get()
   async findAll() {
     return this.authorsService.findAll();
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    return this.authorsService.remove(+id);
   }
 }

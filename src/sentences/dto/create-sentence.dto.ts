@@ -1,4 +1,6 @@
+import { Author } from 'src/authors/entities/author.entity';
+
 export class CreateSentenceDto {
   text: string;
-  authorId: number;
+  author: Author;
 }

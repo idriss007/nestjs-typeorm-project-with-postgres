@@ -20,7 +20,6 @@ export class SentencesService {
 
   async findAll() {
     return await this.sentencesRepository.find({
-      select: { id: true, text: true },
       relations: { author: true },
     });
   }
@@ -41,6 +40,6 @@ export class SentencesService {
   }
 
   async remove(id: number) {
-    await this.sentencesRepository.delete(id);
+    await this.sentencesRepository.softDelete(id);
   }
 }
