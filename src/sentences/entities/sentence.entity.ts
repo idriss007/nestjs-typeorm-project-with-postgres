@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { Author } from '../../authors/entities/author.entity';
 
@@ -15,8 +16,8 @@ export class Sentence {
   @Column()
   text: string;
 
-  @Column()
-  authorId: number;
+  @DeleteDateColumn()
+  deletedDate: Date;
 
   @ManyToOne(() => Author, (author) => author.sentences)
   @JoinColumn()

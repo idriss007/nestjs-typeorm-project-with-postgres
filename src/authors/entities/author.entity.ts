@@ -1,5 +1,6 @@
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
@@ -15,7 +16,13 @@ export class Author {
   @Column()
   name: string;
 
-  @OneToMany(() => Sentence, (sentence) => sentence.author)
+  @DeleteDateColumn()
+  deletedDate: Date;
+
+  @OneToMany(() => Sentence, (sentence) => sentence.author, {
+    orphanedRowAction: 'soft-delete',
+    cascade: true,
+  })
   @JoinColumn()
   sentences: Sentence[];
 

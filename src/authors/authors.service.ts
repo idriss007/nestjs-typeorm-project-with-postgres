@@ -22,4 +22,13 @@ export class AuthorsService {
       relations: { sentences: true },
     });
   }
+
+  async remove(id: number) {
+    const author: any = await this.authorsRepository.find({
+      where: { id: id },
+      relations: { sentences: true },
+    });
+
+    return await this.authorsRepository.softRemove(author);
+  }
 }
