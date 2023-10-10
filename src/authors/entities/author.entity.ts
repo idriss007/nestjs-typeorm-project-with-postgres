@@ -20,8 +20,8 @@ export class Author {
   deletedDate: Date;
 
   @OneToMany(() => Sentence, (sentence) => sentence.author, {
-    orphanedRowAction: 'soft-delete',
-    cascade: true,
+    // orphanedRowAction: 'soft-delete',
+    // cascade: true,
   })
   @JoinColumn()
   sentences: Sentence[];
