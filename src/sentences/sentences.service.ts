@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSentenceDto } from './dto/create-sentence.dto';
-import { EntityManager, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Sentence } from './entities/sentence.entity';
 import { UpdateSentenceDto } from './dto/update-sentence.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class SentencesService {
@@ -11,11 +12,19 @@ export class SentencesService {
     @InjectRepository(Sentence)
     private readonly sentencesRepository: Repository<Sentence>,
     private readonly entityManager: EntityManager,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(createSentenceDto: CreateSentenceDto) {
-    const sentence = new Sentence(createSentenceDto);
+    const sentence = new Sentence({ ...createSentenceDto, comments: [] });
     await this.entityManager.save(sentence);
+  }
+
+  async createComment(id: number, createCommentDto: CreateCommentDto) {
+    const sentence = await this.sentencesRepository.findOneBy({ id });
+    sentence?.comments.push(createCommentDto);
+
+    return await this.sentencesRepository.save(sentence!);
   }
 
   async findAll() {
@@ -25,8 +34,6 @@ export class SentencesService {
   }
 
   async findOne(id: number) {
-    console.log(typeof id);
-
     return await this.sentencesRepository.findOne({
       where: { id },
       relations: { author: true },
@@ -36,10 +43,32 @@ export class SentencesService {
   async update(id: number, updateSentenceDto: UpdateSentenceDto) {
     const sentence = await this.sentencesRepository.findOneBy({ id });
     sentence!.text = updateSentenceDto.text;
-    await this.sentencesRepository.save(sentence!);
+
+    return await this.sentencesRepository.save(sentence!);
   }
 
   async remove(id: number) {
     await this.sentencesRepository.softDelete(id);
+  }
+
+  async filterComments(id: number, text: string) {
+    const query = `
+    SELECT id,
+       jsonb_path_query_array(
+           comments::jsonb,
+           '$ ? (@[*].text like_regex "${text}" flag "i")'::jsonpath
+       )
+    FROM sentence
+    WHERE jsonb_path_exists(
+            comments::jsonb,
+            '$[*].text ? (@ like_regex "${text}" flag "i")'::jsonpath
+          )
+    AND id = $1
+    ;`;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    const result = await queryRunner.manager.query(query, [id]);
+
+    return result[0]?.jsonb_path_query_array;
   }
 }
