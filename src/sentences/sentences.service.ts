@@ -54,14 +54,14 @@ export class SentencesService {
   async filterComments(id: number, text: string) {
     const query = `
     SELECT id,
-       jsonb_path_query_array(
-           comments::jsonb,
-           '$ ? (@[*].text like_regex "${text}" flag "i")'::jsonpath
-       )
+          jsonb_path_query_array(
+            comments::jsonb,
+            format('$ ? (@[*].text like_regex "%s" flag "i")', '${text}')::jsonpath
+          )
     FROM sentence
     WHERE jsonb_path_exists(
             comments::jsonb,
-            '$[*].text ? (@ like_regex "${text}" flag "i")'::jsonpath
+            format('$[*].text ? (@ like_regex "%s" flag "i")', '${text}')::jsonpath
           )
     AND id = $1
     ;`;
