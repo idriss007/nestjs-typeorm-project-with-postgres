@@ -56,18 +56,18 @@ export class SentencesService {
     SELECT id,
           jsonb_path_query_array(
             comments::jsonb,
-            format('$ ? (@[*].text like_regex "%s" flag "i")', '${text}')::jsonpath
+            format('$ ? (@[*].text like_regex "%s" flag "i")', $1::text)::jsonpath
           )
     FROM sentence
     WHERE jsonb_path_exists(
             comments::jsonb,
-            format('$[*].text ? (@ like_regex "%s" flag "i")', '${text}')::jsonpath
+            format('$[*].text ? (@ like_regex "%s" flag "i")', $1::text)::jsonpath
           )
-    AND id = $1
+    AND id = $2
     ;`;
 
     const queryRunner = this.dataSource.createQueryRunner();
-    const result = await queryRunner.manager.query(query, [id]);
+    const result = await queryRunner.manager.query(query, [text, id]);
 
     return result[0]?.jsonb_path_query_array;
   }
